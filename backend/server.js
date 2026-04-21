@@ -19,6 +19,7 @@ const allowedOrigins = [
   'https://www.gurukultheinstitute.in',
   'https://gurukultheinstitute.in',
   'https://gurukul-fullstack.vercel.app',
+  'https://gurukul-full-stack.vercel.app',
 ];
 
 app.use(cors({
