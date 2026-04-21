@@ -42,3 +42,43 @@ export const enrollInCourse = async (batchId: string) => {
   if (!res.ok) throw new Error("Failed to enroll");
   return res.json();
 };
+
+// --- ADMIN ROUTES ---
+
+export const getAdminCourses = async () => {
+  const res = await fetch(`${API_BASE_URL}/admin/courses`, { headers: getAuthHeaders() });
+  if (!res.ok) throw new Error("Failed to fetch admin courses");
+  return res.json();
+};
+
+export const createAdminCourse = async (courseData: { title: string, category: string, description?: string }) => {
+  const res = await fetch(`${API_BASE_URL}/admin/courses`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(courseData)
+  });
+  if (!res.ok) throw new Error("Failed to create course");
+  return res.json();
+};
+
+export const uploadAdminLecture = async (lectureData: { title: string, courseId: string, videoUrl: string }) => {
+  const res = await fetch(`${API_BASE_URL}/admin/lectures`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(lectureData)
+  });
+  if (!res.ok) throw new Error("Failed to upload lecture");
+  return res.json();
+};
+
+export const getAdminStudents = async () => {
+  const res = await fetch(`${API_BASE_URL}/admin/students`, { headers: getAuthHeaders() });
+  if (!res.ok) throw new Error("Failed to fetch students");
+  return res.json();
+};
+
+export const getAdminEnquiries = async () => {
+  const res = await fetch(`${API_BASE_URL}/admin/enquiries`, { headers: getAuthHeaders() });
+  if (!res.ok) throw new Error("Failed to fetch enquiries");
+  return res.json();
+};

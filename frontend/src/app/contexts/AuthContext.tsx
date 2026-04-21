@@ -31,13 +31,11 @@ interface RegisterData {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Single Admin Account - only this account can create teacher IDs
 const ADMIN_ACCOUNT = {
   id: 'admin-master',
-  name: 'Administrator',
-  email: 'admin@gurukul.com',
-  password: 'admin@123',
-  mobile: '+91 9876543210',
+  name: 'Master Administrator',
+  email: 'infogurukul.theinstitute@gmail.com',
+  mobile: '+91 9999999999',
   role: 'admin' as const,
 };
 
@@ -59,13 +57,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
-    // Check admin account
-    if (email === ADMIN_ACCOUNT.email && password === ADMIN_ACCOUNT.password) {
-      const { password: _, ...userWithoutPassword } = ADMIN_ACCOUNT;
-      setUser(userWithoutPassword);
-      localStorage.setItem('gurukul_user', JSON.stringify(userWithoutPassword));
-      return { success: true };
-    }
 
     // Check teacher accounts created by admin
     const teachers = JSON.parse(localStorage.getItem('gurukul_teachers') || '[]');

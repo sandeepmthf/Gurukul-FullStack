@@ -43,14 +43,12 @@ export default function LoginPage({ onNavigate }: LoginPageProps) {
     setIsLoading(true);
     setError('');
 
-    const localTeachers = JSON.parse(localStorage.getItem('gurukul_teachers') || '[]');
-    const isTeacher = localTeachers.some((t: any) => t.email === email && t.password === password);
-
-    // Handle Admin master account and Teachers directly on frontend to bypass backend API which does not have it natively registered.
-    if ((email === 'admin@gurukul.com' && password === 'admin@123') || isTeacher) {
+    // Early route checks for teacher only
+    const isTeacher = email.endsWith('.teacher@gurukul.com');
+    if (isTeacher) {
       const result = await login(email, password);
       if (result.success) {
-        onNavigate('admin');
+        onNavigate('teacher-panel');
       } else {
         setError(result.error || 'Login failed');
       }
@@ -72,7 +70,11 @@ export default function LoginPage({ onNavigate }: LoginPageProps) {
         if (data.user) {
           setAuthUser(data.user);
         }
-        onNavigate('dashboard');
+        if (data.user && data.user.role === 'admin') {
+          onNavigate('admin-panel');
+        } else {
+          onNavigate('dashboard');
+        }
       } else {
         setError(data.message || data.error || 'Login failed');
       }

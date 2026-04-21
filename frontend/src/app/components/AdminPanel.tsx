@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { getAdminCourses, getAdminStudents, getAdminEnquiries, uploadAdminLecture } from '../../services/api';
 
 interface AdminPanelProps {
   onNavigate: (page: string) => void;
@@ -7,6 +8,40 @@ interface AdminPanelProps {
 export default function AdminPanel({ onNavigate }: AdminPanelProps) {
   const [activeSection, setActiveSection] = useState<'upload' | 'students' | 'courses' | 'enquiries'>('upload');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // States for API data
+  const [courses, setCourses] = useState<any[]>([]);
+  const [students, setStudents] = useState<any[]>([]);
+  const [enquiries, setEnquiries] = useState<any[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+
+  // Upload Form State
+  const [lectureTitle, setLectureTitle] = useState('');
+  const [lectureCourseId, setLectureCourseId] = useState('');
+  const [lectureVideoUrl, setLectureVideoUrl] = useState('');
+
+  // Fetch data
+  useEffect(() => {
+    getAdminCourses().then(res => setCourses(res.data)).catch(console.error);
+    getAdminStudents().then(res => setStudents(res.data)).catch(console.error);
+    getAdminEnquiries().then(res => setEnquiries(res.data)).catch(console.error);
+  }, []);
+
+  const handleUpload = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!lectureTitle || !lectureCourseId || !lectureVideoUrl) return alert("Please fill all fields!");
+    setIsUploading(true);
+    try {
+      await uploadAdminLecture({ title: lectureTitle, courseId: lectureCourseId, videoUrl: lectureVideoUrl });
+      alert("Lecture uploaded successfully!");
+      setLectureTitle('');
+      setLectureVideoUrl('');
+    } catch (err) {
+      alert("Failed to upload lecture");
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-muted via-background to-muted">
@@ -116,7 +151,7 @@ export default function AdminPanel({ onNavigate }: AdminPanelProps) {
               <p className="text-muted-foreground mb-8">Add new video content</p>
 
               <div className="bg-white rounded-3xl shadow-xl p-8 border border-border">
-                <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+                <form className="space-y-6" onSubmit={handleUpload}>
                   <div>
                     <label className="block mb-2 font-semibold text-primary flex items-center gap-2">
                       <span className="text-lg">📝</span>
@@ -124,6 +159,8 @@ export default function AdminPanel({ onNavigate }: AdminPanelProps) {
                     </label>
                     <input
                       type="text"
+                      value={lectureTitle}
+                      onChange={e => setLectureTitle(e.target.value)}
                       placeholder="Enter lecture title"
                       className="w-full px-5 py-4 border-2 border-border rounded-xl bg-input-background focus:border-accent focus:ring-4 focus:ring-accent/10 focus:outline-none transition-all"
                     />
@@ -134,36 +171,41 @@ export default function AdminPanel({ onNavigate }: AdminPanelProps) {
                       <span className="text-lg">📚</span>
                       Select Course
                     </label>
-                    <select className="w-full px-5 py-4 border-2 border-border rounded-xl bg-input-background focus:border-accent focus:ring-4 focus:ring-accent/10 focus:outline-none transition-all">
-                      <option>Select Course</option>
-                      <option>Class 6-8</option>
-                      <option>Class 9-10</option>
-                      <option>IIT JEE</option>
-                      <option>NEET</option>
+                    <select 
+                      value={lectureCourseId}
+                      onChange={e => setLectureCourseId(e.target.value)}
+                      className="w-full px-5 py-4 border-2 border-border rounded-xl bg-input-background focus:border-accent focus:ring-4 focus:ring-accent/10 focus:outline-none transition-all"
+                    >
+                      <option value="">Select Course</option>
+                      {courses.map((course: any) => (
+                        <option key={course._id} value={course._id}>{course.title} ({course.category})</option>
+                      ))}
                     </select>
                   </div>
 
                   <div>
                     <label className="block mb-2 font-semibold text-primary flex items-center gap-2">
                       <span className="text-lg">🎥</span>
-                      Video File
+                      Video URL (mp4 link for now)
                     </label>
-                    <div className="relative border-3 border-dashed border-border hover:border-accent/50 rounded-2xl p-12 text-center bg-gradient-to-br from-muted/30 to-background transition-all cursor-pointer group">
-                      <div className="text-6xl mb-4 group-hover:scale-110 transition-transform">📹</div>
-                      <p className="font-semibold text-primary mb-1">Click to upload video</p>
-                      <p className="text-sm text-muted-foreground">or drag and drop</p>
-                      <p className="text-xs text-muted-foreground mt-2">MP4, MOV up to 500MB</p>
-                    </div>
+                    <input
+                      type="text"
+                      value={lectureVideoUrl}
+                      onChange={e => setLectureVideoUrl(e.target.value)}
+                      placeholder="https://example.com/video.mp4"
+                      className="w-full px-5 py-4 border-2 border-border rounded-xl bg-input-background focus:border-accent focus:ring-4 focus:ring-accent/10 focus:outline-none transition-all"
+                    />
                   </div>
 
                   <button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-accent to-indigo-600 hover:from-accent/90 hover:to-indigo-600/90 text-white font-bold py-5 px-6 rounded-xl shadow-lg shadow-accent/30 hover:shadow-xl hover:shadow-accent/40 transition-all hover:scale-[1.02] flex items-center justify-center gap-2"
+                    disabled={isUploading}
+                    className="w-full bg-gradient-to-r from-accent to-indigo-600 hover:from-accent/90 hover:to-indigo-600/90 text-white font-bold py-5 px-6 rounded-xl shadow-lg shadow-accent/30 hover:shadow-xl hover:shadow-accent/40 transition-all hover:scale-[1.02] flex items-center justify-center gap-2 disabled:opacity-50"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                     </svg>
-                    <span>Upload Lecture</span>
+                    <span>{isUploading ? 'Uploading...' : 'Upload Lecture'}</span>
                   </button>
                 </form>
               </div>
@@ -189,14 +231,17 @@ export default function AdminPanel({ onNavigate }: AdminPanelProps) {
                       </tr>
                     </thead>
                     <tbody>
-                      {[1, 2, 3, 4, 5].map((i) => (
-                        <tr key={i} className="border-b border-border hover:bg-muted/30 transition-colors">
-                          <td className="px-6 py-4 font-medium text-primary">Student Name {i}</td>
-                          <td className="px-6 py-4 text-muted-foreground">+91 9876543{i}10</td>
-                          <td className="px-6 py-4 text-muted-foreground">Class 10</td>
+                      {students.length === 0 && (
+                        <tr><td colSpan={4} className="px-6 py-4 text-center text-muted-foreground">No students enrolled yet.</td></tr>
+                      )}
+                      {students.map((student: any) => (
+                        <tr key={student._id} className="border-b border-border hover:bg-muted/30 transition-colors">
+                          <td className="px-6 py-4 font-medium text-primary">{student.name}</td>
+                          <td className="px-6 py-4 text-muted-foreground">{student.mobile || student.email}</td>
+                          <td className="px-6 py-4 text-muted-foreground">{student.batch || 'Unassigned'}</td>
                           <td className="px-6 py-4">
                             <span className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-sm font-semibold">
-                              Active
+                              {student.isVerified ? 'Verified' : 'Pending'}
                             </span>
                           </td>
                         </tr>
@@ -216,20 +261,26 @@ export default function AdminPanel({ onNavigate }: AdminPanelProps) {
               <p className="text-muted-foreground mb-8">Course management</p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {['Class 6-8', 'Class 9-10', 'IIT JEE', 'NEET', 'SSC', 'Police'].map((course, i) => (
+                {courses.length === 0 && (
+                  <div className="col-span-full py-8 text-center text-muted-foreground bg-white rounded-2xl border border-border">
+                    No courses available. The database is empty.
+                  </div>
+                )}
+                {courses.map((course: any) => (
                   <div
-                    key={i}
+                    key={course._id}
                     className="bg-white rounded-2xl shadow-lg p-6 border border-border hover:shadow-xl hover:-translate-y-1 transition-all"
                   >
                     <div className="text-4xl mb-4">📚</div>
                     <h3 className="font-bold text-xl text-primary mb-2" style={{ fontFamily: 'var(--font-family-display)' }}>
-                      {course}
+                      {course.title}
                     </h3>
+                    <p className="text-xs text-accent font-semibold mb-2">{course.category}</p>
                     <p className="text-sm text-muted-foreground mb-4">
-                      {Math.floor(Math.random() * 50) + 20} Lectures • {Math.floor(Math.random() * 100) + 50} Students
+                      {course.description || "No description provided."}
                     </p>
                     <button className="w-full bg-muted hover:bg-muted/70 text-primary font-semibold py-2.5 px-4 rounded-lg transition-all">
-                      Edit Course
+                      Manage Content
                     </button>
                   </div>
                 ))}
@@ -245,26 +296,31 @@ export default function AdminPanel({ onNavigate }: AdminPanelProps) {
               <p className="text-muted-foreground mb-8">Student inquiries</p>
 
               <div className="space-y-4">
-                {[1, 2, 3, 4].map((i) => (
+                {enquiries.length === 0 && (
+                  <div className="py-8 text-center text-muted-foreground bg-white rounded-2xl border border-border">
+                    No recent enquiries.
+                  </div>
+                )}
+                {enquiries.map((enq: any) => (
                   <div
-                    key={i}
+                    key={enq._id}
                     className="bg-white rounded-2xl shadow-lg p-6 border border-border hover:shadow-xl transition-all"
                   >
                     <div className="flex justify-between items-start mb-3">
                       <div>
-                        <h3 className="font-semibold text-lg text-primary mb-1">Student Name {i}</h3>
+                        <h3 className="font-semibold text-lg text-primary mb-1">{enq.name}</h3>
                         <p className="text-sm text-muted-foreground flex items-center gap-2">
                           <span>📱</span>
-                          <span>+91 9876543210</span>
+                          <span>{enq.mobile || enq.email}</span>
                         </p>
                       </div>
                       <span className="text-xs text-muted-foreground bg-muted px-3 py-1 rounded-full">
-                        {i === 1 ? 'Today' : `${i} days ago`}
+                        {new Date(enq.createdAt).toLocaleDateString()}
                       </span>
                     </div>
                     <div className="p-3 bg-muted/50 rounded-lg">
                       <p className="text-sm text-foreground">
-                        <span className="font-semibold">Interested in:</span> IIT JEE Course
+                        <span className="font-semibold">Account created:</span> Recently Registered
                       </p>
                     </div>
                   </div>

@@ -4,33 +4,39 @@ import User from './models/User.js';
 
 dotenv.config();
 
-const seedAdmin = async () => {
+const updateAdmin = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI);
     console.log('Connected to MongoDB');
 
-    const adminEmail = 'admin@gurukul.com';
-    const existingAdmin = await User.findOne({ email: adminEmail });
+    const adminEmail = 'infogurukul.theinstitute@gmail.com';
+    const adminPassword = 'Gurukul@9044';
 
-    if (existingAdmin) {
-      console.log('Admin already exists in the database.');
+    let user = await User.findOne({ email: adminEmail });
+
+    if (user) {
+      user.password = adminPassword;
+      user.role = 'admin';
+      user.isVerified = true;
+      await user.save();
+      console.log('Updated existing user to Admin.');
     } else {
       await User.create({
-        name: 'Administrator',
+        name: 'Master Administrator',
         email: adminEmail,
-        password: 'admin@123',
-        mobile: '9876543210',
+        password: adminPassword,
+        mobile: '9999999999',
         role: 'admin',
         isVerified: true
       });
-      console.log('Admin user successfully seeded!');
+      console.log('Created new Master Admin account!');
     }
 
     mongoose.disconnect();
   } catch (error) {
-    console.error('Error seeding admin:', error);
+    console.error('Error updating admin:', error);
     mongoose.disconnect();
   }
 };
 
-seedAdmin();
+updateAdmin();

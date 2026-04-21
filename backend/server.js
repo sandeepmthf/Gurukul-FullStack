@@ -3,8 +3,11 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 import User from './models/User.js';
+import Course from './models/Course.js';
 import { protect } from './middleware/authMiddleware.js';
+import { adminProtect } from './middleware/adminMiddleware.js';
 
 dotenv.config();
 
@@ -17,6 +20,7 @@ app.get('/api/health', (_req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminProtect, adminRoutes);
 
 // Get user profile (protected by JWT)
 app.get('/api/user/profile', protect, async (req, res) => {
@@ -39,8 +43,13 @@ app.get('/api/user/profile', protect, async (req, res) => {
   }
 });
 
-app.get('/api/student/batches', protect, (_req, res) => {
-  res.json({ success: true, data: [] });
+app.get('/api/student/batches', protect, async (_req, res) => {
+  try {
+    const courses = await Course.find({}).lean();
+    res.json({ success: true, data: courses });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 });
 
 const PORT = Number(process.env.PORT || 5001);
