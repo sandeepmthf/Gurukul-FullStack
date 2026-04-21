@@ -43,19 +43,6 @@ export default function LoginPage({ onNavigate }: LoginPageProps) {
     setIsLoading(true);
     setError('');
 
-    // Early route checks for teacher only
-    const isTeacher = email.endsWith('.teacher@gurukul.com');
-    if (isTeacher) {
-      const result = await login(email, password);
-      if (result.success) {
-        onNavigate('teacher-panel');
-      } else {
-        setError(result.error || 'Login failed');
-      }
-      setIsLoading(false);
-      return;
-    }
-
     try {
       const response = await fetch(`${API_BASE_URL}/auth/login-password`, {
         method: 'POST',
@@ -70,8 +57,8 @@ export default function LoginPage({ onNavigate }: LoginPageProps) {
         if (data.user) {
           setAuthUser(data.user);
         }
-        if (data.user && data.user.role === 'admin') {
-          onNavigate('admin-panel');
+        if (data.user && (data.user.role === 'admin' || data.user.role === 'teacher')) {
+          onNavigate('admin');
         } else {
           onNavigate('dashboard');
         }
