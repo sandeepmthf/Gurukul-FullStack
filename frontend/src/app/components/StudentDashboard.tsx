@@ -187,8 +187,8 @@ export default function StudentDashboard({ onNavigate }: StudentDashboardProps) 
               {[
                 { label: 'Status', value: '✅ Active', bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-700' },
                 { label: 'Role', value: displayRole, bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-700' },
-                { label: 'Batch', value: displayBatch ? formatBatchName(displayBatch) : 'Not Assigned', bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-700' },
-                { label: 'Courses', value: `${batches.length} Enrolled`, bg: 'bg-purple-50', border: 'border-purple-200', text: 'text-purple-700' },
+                { label: 'Batch Session', value: '2026-2027', bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-700' },
+                { label: 'My Batch', value: displayBatch ? formatBatchName(displayBatch) : 'Not Assigned', bg: 'bg-purple-50', border: 'border-purple-200', text: 'text-purple-700' },
               ].map((stat, i) => (
                 <div key={i} className={`${stat.bg} ${stat.border} border rounded-2xl p-4 md:p-5`} style={{ animation: `fadeInUp 0.4s ease-out ${i * 0.1}s backwards` }}>
                   <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">{stat.label}</p>

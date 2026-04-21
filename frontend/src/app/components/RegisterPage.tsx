@@ -242,12 +242,13 @@ export default function RegisterPage({ onNavigate }: RegisterPageProps) {
                       className="w-full px-5 py-4 border-2 border-border rounded-xl bg-input-background focus:border-accent focus:ring-4 focus:ring-accent/10 focus:outline-none transition-all text-lg hover:border-accent/50"
                     >
                       <option value="">Select a batch</option>
-                      <option value="IIT-JEE-2024">IIT JEE 2024</option>
+                      <option value="IIT-JEE-2025-2026">IIT JEE 2025-2026</option>
                       <option value="IIT-JEE-2026-2027">IIT JEE 2026-2027</option>
+                      <option value="NEET-2025-2026">NEET 2025-2026</option>
                       <option value="NEET-2026-2027">NEET 2026-2027</option>
-                      <option value="CLASS-10-2024">Class 10 - 2024</option>
-                      <option value="CLASS-12-2024">Class 12 - 2024</option>
-                      <option value="SSC-2024">SSC CGL 2024</option>
+                      <option value="CLASS-10-2025-2026">Class 10 - 2025-2026</option>
+                      <option value="CLASS-12-2025-2026">Class 12 - 2025-2026</option>
+                      <option value="SSC-2025-2026">SSC CGL 2025-2026</option>
                     </select>
                   </div>
                 )}
