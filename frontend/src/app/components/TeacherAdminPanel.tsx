@@ -19,13 +19,13 @@ interface Lecture {
 }
 
 const BATCHES = [
-  { id: 'IIT-JEE-2025-2026', name: 'IIT JEE 2025-2026', color: 'from-blue-500 to-indigo-600' },
-  { id: 'IIT-JEE-2026-2027', name: 'IIT JEE 2026-2027', color: 'from-blue-600 to-indigo-700' },
-  { id: 'NEET-2025-2026', name: 'NEET 2025-2026', color: 'from-emerald-500 to-teal-600' },
-  { id: 'NEET-2026-2027', name: 'NEET 2026-2027', color: 'from-emerald-600 to-teal-700' },
-  { id: 'CLASS-10-2025-2026', name: 'Class 10 - 2025-2026', color: 'from-amber-500 to-orange-600' },
-  { id: 'CLASS-12-2025-2026', name: 'Class 12 - 2025-2026', color: 'from-purple-500 to-pink-600' },
-  { id: 'SSC-2025-2026', name: 'SSC CGL 2025-2026', color: 'from-rose-500 to-red-600' },
+  { id: 'IIT-JEE-2026', name: 'IIT JEE 2026', color: 'from-blue-500 to-indigo-600' },
+  { id: 'IIT-JEE-2027', name: 'IIT JEE 2027', color: 'from-blue-600 to-indigo-700' },
+  { id: 'NEET-2026', name: 'NEET 2026', color: 'from-emerald-500 to-teal-600' },
+  { id: 'NEET-2027', name: 'NEET 2027', color: 'from-emerald-600 to-teal-700' },
+  { id: 'CLASS-10-2026', name: 'Class 10 - 2026', color: 'from-amber-500 to-orange-600' },
+  { id: 'CLASS-12-2026', name: 'Class 12 - 2026', color: 'from-purple-500 to-pink-600' },
+  { id: 'SSC-2026', name: 'SSC CGL 2026', color: 'from-rose-500 to-red-600' },
 ];
 
 export default function TeacherAdminPanel({ onNavigate }: AdminPanelProps) {
@@ -538,7 +538,7 @@ export default function TeacherAdminPanel({ onNavigate }: AdminPanelProps) {
                       <tr className="border-b border-border hover:bg-muted/30 transition-colors">
                         <td className="px-6 py-4 font-medium text-primary">Rahul Sharma</td>
                         <td className="px-6 py-4 text-muted-foreground">student@gurukul.com</td>
-                        <td className="px-6 py-4 text-muted-foreground">IIT JEE 2025-2026</td>
+                        <td className="px-6 py-4 text-muted-foreground">IIT JEE 2026</td>
                         <td className="px-6 py-4">
                           <span className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-sm font-semibold">
                             Active
