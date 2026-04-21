@@ -34,7 +34,7 @@ const ALL_SUBJECTS = [
 
 export default function AdminMasterPanel({ onNavigate }: AdminPanelProps) {
   const { user, logout } = useAuth();
-  const [activeSection, setActiveSection] = useState<'create-teacher' | 'teachers' | 'students' | 'lectures'>('teachers');
+  const [activeSection, setActiveSection] = useState<'dashboard' | 'create-teacher' | 'teachers' | 'students' | 'lectures'>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [students, setStudents] = useState<any[]>([]);
@@ -172,6 +172,16 @@ export default function AdminMasterPanel({ onNavigate }: AdminPanelProps) {
 
         <nav className="p-4 space-y-2">
           <NavButton
+            active={activeSection === 'dashboard'}
+            onClick={() => {
+              setActiveSection('dashboard');
+              setSidebarOpen(false);
+            }}
+            icon="📊"
+          >
+            Dashboard
+          </NavButton>
+          <NavButton
             active={activeSection === 'teachers'}
             onClick={() => {
               setActiveSection('teachers');
@@ -252,6 +262,66 @@ export default function AdminMasterPanel({ onNavigate }: AdminPanelProps) {
         </div>
 
         <div className="p-6 lg:p-10">
+          {/* Dashboard Overview */}
+          {activeSection === 'dashboard' && (
+            <div>
+              <div className="mb-10">
+                <h2 className="font-bold text-3xl text-primary mb-2" style={{ fontFamily: 'var(--font-family-display)' }}>
+                  Admin Dashboard
+                </h2>
+                <p className="text-muted-foreground">Manage your institute's staff and students</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                <QuickActionCard
+                  title="Create Teacher ID"
+                  description="Add new teaching staff to the platform"
+                  icon="➕"
+                  color="bg-accent"
+                  onClick={() => setActiveSection('create-teacher')}
+                />
+                <QuickActionCard
+                  title="All Students"
+                  description="View and manage registered students"
+                  icon="👥"
+                  color="bg-blue-600"
+                  onClick={() => setActiveSection('students')}
+                />
+                <QuickActionCard
+                  title="View Teachers"
+                  description="Monitor and edit staff accounts"
+                  icon="👨‍🏫"
+                  color="bg-emerald-600"
+                  onClick={() => setActiveSection('teachers')}
+                />
+                <QuickActionCard
+                  title="Lectures"
+                  description="Check uploaded video content"
+                  icon="🎥"
+                  color="bg-amber-500"
+                  onClick={() => setActiveSection('lectures')}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Stats or recent activity could go here */}
+                <div className="bg-white rounded-3xl p-8 border border-border shadow-lg">
+                  <h3 className="font-bold text-xl text-primary mb-4">Account Summary</h3>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center p-4 bg-muted rounded-2xl">
+                      <span className="font-semibold">Total Teachers</span>
+                      <span className="text-2xl font-bold text-accent">{teachers.length}</span>
+                    </div>
+                    <div className="flex justify-between items-center p-4 bg-muted rounded-2xl">
+                      <span className="font-semibold">Registered Students</span>
+                      <span className="text-2xl font-bold text-blue-600">{students.length}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Create Teacher Section */}
           {activeSection === 'create-teacher' && (
             <div className="max-w-3xl">
@@ -559,6 +629,35 @@ function NavButton({
     >
       <span className="text-xl">{icon}</span>
       <span>{children}</span>
+    </button>
+  );
+}
+
+function QuickActionCard({ 
+  title, 
+  description, 
+  icon, 
+  color, 
+  onClick 
+}: { 
+  title: string; 
+  description: string; 
+  icon: string; 
+  color: string; 
+  onClick: () => void 
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="bg-white p-6 rounded-3xl border border-border shadow-md hover:shadow-xl hover:scale-[1.03] transition-all text-left flex flex-col gap-4 group"
+    >
+      <div className={`w-14 h-14 ${color} rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-black/10 group-hover:rotate-12 transition-transform`}>
+        {icon}
+      </div>
+      <div>
+        <h3 className="font-bold text-lg text-primary">{title}</h3>
+        <p className="text-sm text-muted-foreground">{description}</p>
+      </div>
     </button>
   );
 }
