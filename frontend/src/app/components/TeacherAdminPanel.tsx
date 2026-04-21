@@ -20,9 +20,9 @@ interface Lecture {
 
 const BATCHES = [
   { id: 'IIT-JEE-2024', name: 'IIT JEE 2024', color: 'from-blue-500 to-indigo-600' },
-  { id: 'IIT-JEE-2025', name: 'IIT JEE 2025', color: 'from-blue-600 to-indigo-700' },
+  { id: 'IIT-JEE-2026-2027', name: 'IIT JEE 2026-2027', color: 'from-blue-600 to-indigo-700' },
   { id: 'NEET-2024', name: 'NEET 2024', color: 'from-emerald-500 to-teal-600' },
-  { id: 'NEET-2025', name: 'NEET 2025', color: 'from-emerald-600 to-teal-700' },
+  { id: 'NEET-2026-2027', name: 'NEET 2026-2027', color: 'from-emerald-600 to-teal-700' },
   { id: 'CLASS-10-2024', name: 'Class 10 - 2024', color: 'from-amber-500 to-orange-600' },
   { id: 'CLASS-12-2024', name: 'Class 12 - 2024', color: 'from-purple-500 to-pink-600' },
   { id: 'SSC-2024', name: 'SSC CGL 2024', color: 'from-rose-500 to-red-600' },

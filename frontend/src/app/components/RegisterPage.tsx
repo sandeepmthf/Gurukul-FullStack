@@ -243,9 +243,8 @@ export default function RegisterPage({ onNavigate }: RegisterPageProps) {
                     >
                       <option value="">Select a batch</option>
                       <option value="IIT-JEE-2024">IIT JEE 2024</option>
-                      <option value="IIT-JEE-2025">IIT JEE 2025</option>
-                      <option value="NEET-2024">NEET 2024</option>
-                      <option value="NEET-2025">NEET 2025</option>
+                      <option value="IIT-JEE-2026-2027">IIT JEE 2026-2027</option>
+                      <option value="NEET-2026-2027">NEET 2026-2027</option>
                       <option value="CLASS-10-2024">Class 10 - 2024</option>
                       <option value="CLASS-12-2024">Class 12 - 2024</option>
                       <option value="SSC-2024">SSC CGL 2024</option>
