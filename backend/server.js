@@ -12,7 +12,27 @@ import { adminProtect } from './middleware/adminMiddleware.js';
 dotenv.config();
 
 const app = express();
-app.use(cors());
+
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'https://www.gurukultheinstitute.in',
+  'https://gurukultheinstitute.in',
+  'https://gurukul-fullstack.vercel.app',
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, curl, Render health checks)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error(`CORS blocked: origin ${origin} not allowed`));
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+app.options('*', cors());
 app.use(express.json());
 
 app.get('/api/health', (_req, res) => {
