@@ -58,9 +58,47 @@ router.get('/students', async (req, res) => {
 // Get recent enquiries (Mocked or using User registrations for now)
 router.get('/enquiries', async (req, res) => {
   try {
-    // Just fetch recently created users to mock inquiries
     const recentStudents = await User.find({ role: 'student' }).sort({ createdAt: -1 }).limit(10).select('name mobile email createdAt').lean();
     res.json({ success: true, data: recentStudents });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Create a new teacher (Admin only)
+router.post('/teachers', async (req, res) => {
+  try {
+    const { name, email, password, mobile, subjects } = req.body;
+    if (!name || !email || !password || !mobile) {
+      return res.status(400).json({ success: false, message: 'All fields are required' });
+    }
+
+    const existing = await User.findOne({ email });
+    if (existing) {
+      return res.status(409).json({ success: false, message: 'Email already registered' });
+    }
+
+    const teacher = await User.create({
+      name,
+      email,
+      password, // In production, hash this!
+      mobile,
+      subjects,
+      role: 'teacher',
+      isVerified: true
+    });
+
+    res.status(201).json({ success: true, data: teacher });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Get all teachers
+router.get('/teachers', async (req, res) => {
+  try {
+    const teachers = await User.find({ role: 'teacher' }).sort({ createdAt: -1 }).lean();
+    res.json({ success: true, data: teachers });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

@@ -57,102 +57,53 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
-
-    // Check teacher accounts created by admin
-    const teachers = JSON.parse(localStorage.getItem('gurukul_teachers') || '[]');
-    const teacher = teachers.find(
-      (t: any) => t.email === email && t.password === password
-    );
-
-    if (teacher) {
-      const { password: _, ...userWithoutPassword } = teacher;
-      setUser(userWithoutPassword);
-      localStorage.setItem('gurukul_user', JSON.stringify(userWithoutPassword));
-      return { success: true };
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setUser(data.user);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('token', data.token);
+        return { success: true };
+      } else {
+        return { success: false, error: data.message || 'Invalid email or password' };
+      }
+    } catch (err) {
+      return { success: false, error: 'Network error or server down' };
     }
-
-    // Check registered student users from localStorage
-    const registeredUsers = JSON.parse(localStorage.getItem('gurukul_registered_users') || '[]');
-    const registeredUser = registeredUsers.find(
-      (u: any) => u.email === email && u.password === password
-    );
-
-    if (registeredUser) {
-      const { password: _, ...userWithoutPassword } = registeredUser;
-      setUser(userWithoutPassword);
-      localStorage.setItem('gurukul_user', JSON.stringify(userWithoutPassword));
-      return { success: true };
-    }
-
-    return { success: false, error: 'Invalid email or password' };
   };
 
   const loginWithOTP = async (contact: string, type: 'mobile' | 'email'): Promise<{ success: boolean; error?: string }> => {
-    // Find user by mobile or email
-    const registeredUsers = JSON.parse(localStorage.getItem('gurukul_registered_users') || '[]');
-    const teachers = JSON.parse(localStorage.getItem('gurukul_teachers') || '[]');
-    
-    let foundUser = null;
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ [type === 'email' ? 'email' : 'mobile']: contact, otp: '123456' }) 
+      });
+      const data = await res.json();
 
-    if (type === 'mobile') {
-      foundUser = registeredUsers.find((u: any) => u.mobile === contact) ||
-                  teachers.find((t: any) => t.mobile === contact);
-    } else {
-      foundUser = registeredUsers.find((u: any) => u.email === contact) ||
-                  teachers.find((t: any) => t.email === contact);
+      if (data.success) {
+        setUser(data.user);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('token', data.token);
+        return { success: true };
+      } else {
+        return { success: false, error: data.message || 'Login failed' };
+      }
+    } catch (err) {
+      return { success: false, error: 'Network error' };
     }
-
-    if (!foundUser) {
-      return { success: false, error: 'Account not found. Please register first.' };
-    }
-
-    // Login successful - set user
-    const { password: _, ...userWithoutPassword } = foundUser;
-    setUser(userWithoutPassword);
-    localStorage.setItem('gurukul_user', JSON.stringify(userWithoutPassword));
-
-    return { success: true };
   };
 
   const register = async (data: RegisterData): Promise<{ success: boolean; error?: string }> => {
-    // Check if email already exists
-    const registeredUsers = JSON.parse(localStorage.getItem('gurukul_registered_users') || '[]');
-    const teachers = JSON.parse(localStorage.getItem('gurukul_teachers') || '[]');
-    
-    const emailExists = 
-      registeredUsers.some((u: any) => u.email === data.email) ||
-      teachers.some((t: any) => t.email === data.email) ||
-      data.email === ADMIN_ACCOUNT.email;
-
-    if (emailExists) {
-      return { success: false, error: 'Email already registered' };
-    }
-
-    // Only allow student registration through public form
-    if (data.role !== 'student') {
-      return { success: false, error: 'Only students can register. Teachers must be created by admin.' };
-    }
-
-    // Create new user
-    const newUser = {
-      id: `user-${Date.now()}`,
-      name: data.name,
-      email: data.email,
-      mobile: data.mobile,
-      role: data.role,
-      password: data.password,
-      batch: data.batch,
-    };
-
-    // Save to localStorage
-    registeredUsers.push(newUser);
-    localStorage.setItem('gurukul_registered_users', JSON.stringify(registeredUsers));
-
-    // Auto login after registration
-    const { password: _, ...userWithoutPassword } = newUser;
-    setUser(userWithoutPassword);
-    localStorage.setItem('gurukul_user', JSON.stringify(userWithoutPassword));
-
+    // Student registration is handled by OTPRegistration component directly calling the API.
+    // This context method is a placeholder or can be used for auto-login after external registration.
     return { success: true };
   };
 

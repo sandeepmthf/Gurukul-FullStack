@@ -82,3 +82,19 @@ export const getAdminEnquiries = async () => {
   if (!res.ok) throw new Error("Failed to fetch enquiries");
   return res.json();
 };
+
+export const getAdminTeachers = async () => {
+  const res = await fetch(`${API_BASE_URL}/admin/teachers`, { headers: getAuthHeaders() });
+  if (!res.ok) throw new Error("Failed to fetch teachers");
+  return res.json();
+};
+
+export const createAdminTeacher = async (teacherData: any) => {
+  const res = await fetch(`${API_BASE_URL}/admin/teachers`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(teacherData)
+  });
+  if (!res.ok) throw new Error("Failed to create teacher");
+  return res.json();
+};

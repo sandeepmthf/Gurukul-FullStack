@@ -7,6 +7,8 @@ const userSchema = new mongoose.Schema(
     password: { type: String, required: true },
     mobile: { type: String, default: '', trim: true },
     batch: { type: String, default: '', trim: true },
+    role: { type: String, enum: ['student', 'teacher', 'admin'], default: 'student' },
+    subjects: { type: [String], default: [] },
     isVerified: { type: Boolean, default: false },
   },
   { timestamps: true }

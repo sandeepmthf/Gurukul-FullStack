@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { getAdminTeachers, createAdminTeacher, getAdminStudents } from '../../services/api';
 
 interface AdminPanelProps {
   onNavigate: (page: string) => void;
@@ -36,6 +37,8 @@ export default function AdminMasterPanel({ onNavigate }: AdminPanelProps) {
   const [activeSection, setActiveSection] = useState<'create-teacher' | 'teachers' | 'students' | 'lectures'>('teachers');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [teachers, setTeachers] = useState<Teacher[]>([]);
+  const [students, setStudents] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
 
@@ -47,12 +50,25 @@ export default function AdminMasterPanel({ onNavigate }: AdminPanelProps) {
     subjects: [] as string[],
   });
 
-  // Load teachers from localStorage
+  // Load data from API
   useEffect(() => {
-    const storedTeachers = localStorage.getItem('gurukul_teachers');
-    if (storedTeachers) {
-      setTeachers(JSON.parse(storedTeachers));
-    }
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const [teachersRes, studentsRes] = await Promise.all([
+          getAdminTeachers(),
+          getAdminStudents()
+        ]);
+        setTeachers(teachersRes.data || []);
+        setStudents(studentsRes.data || []);
+      } catch (err) {
+        console.error("Failed to fetch admin data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
   const handleLogout = () => {
@@ -74,7 +90,7 @@ export default function AdminMasterPanel({ onNavigate }: AdminPanelProps) {
     }
   };
 
-  const handleCreateTeacher = (e: React.FormEvent) => {
+  const handleCreateTeacher = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (teacherForm.subjects.length === 0) {
@@ -82,37 +98,31 @@ export default function AdminMasterPanel({ onNavigate }: AdminPanelProps) {
       return;
     }
 
-    const newTeacher: Teacher = {
-      id: `teacher-${Date.now()}`,
-      name: teacherForm.name,
-      email: teacherForm.email,
-      password: teacherForm.password,
-      mobile: teacherForm.mobile,
-      role: 'teacher',
-      subjects: teacherForm.subjects,
-      createdAt: new Date().toISOString(),
-    };
+    setLoading(true);
+    try {
+      const res = await createAdminTeacher(teacherForm);
+      if (res.success) {
+        setTeachers([res.data, ...teachers]);
+        
+        setSuccessMessage(`Teacher ${teacherForm.name} created successfully!`);
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
 
-    const updatedTeachers = [...teachers, newTeacher];
-    setTeachers(updatedTeachers);
-    localStorage.setItem('gurukul_teachers', JSON.stringify(updatedTeachers));
+        setTeacherForm({
+          name: '',
+          email: '',
+          password: '',
+          mobile: '',
+          subjects: [],
+        });
 
-    // Show success message
-    setSuccessMessage(`Teacher ${teacherForm.name} created successfully!`);
-    setShowSuccess(true);
-    setTimeout(() => setShowSuccess(false), 3000);
-
-    // Reset form
-    setTeacherForm({
-      name: '',
-      email: '',
-      password: '',
-      mobile: '',
-      subjects: [],
-    });
-
-    // Switch to teachers list
-    setTimeout(() => setActiveSection('teachers'), 1500);
+        setTimeout(() => setActiveSection('teachers'), 1500);
+      }
+    } catch (err: any) {
+      alert(err.message || "Failed to create teacher");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDeleteTeacher = (id: string) => {
@@ -125,10 +135,6 @@ export default function AdminMasterPanel({ onNavigate }: AdminPanelProps) {
 
   const getAllLectures = () => {
     return JSON.parse(localStorage.getItem('gurukul_lectures') || '[]');
-  };
-
-  const getAllStudents = () => {
-    return JSON.parse(localStorage.getItem('gurukul_registered_users') || '[]');
   };
 
   return (
@@ -469,7 +475,7 @@ export default function AdminMasterPanel({ onNavigate }: AdminPanelProps) {
                       </tr>
                     </thead>
                     <tbody>
-                      {getAllStudents().map((student: any, i: number) => (
+                      {students.map((student: any, i: number) => (
                         <tr key={i} className="border-b border-border hover:bg-muted/30 transition-colors">
                           <td className="px-6 py-4 font-medium text-primary">{student.name}</td>
                           <td className="px-6 py-4 text-muted-foreground">{student.email}</td>

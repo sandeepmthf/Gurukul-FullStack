@@ -21,7 +21,8 @@ const sanitizeUser = (user) => ({
   mobile: user.mobile || '',
   batch: user.batch || '',
   isVerified: user.isVerified,
-  role: 'student',
+  role: user.role || 'student',
+  subjects: user.subjects || [],
 });
 
 router.post('/register/send-otp', async (req, res) => {
